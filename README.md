@@ -39,17 +39,21 @@ char GetKeyPress(); // returns the key that was just pressed, if any. otherwise,
 ```
 ___
 # Example
+![a6bi6tBqag](https://user-images.githubusercontent.com/66477673/145897606-406bf8f7-edf7-4fb6-922b-0efa6538b10a.gif)
 ```c
 #include "conr.h"
+#include "math.h"
 
 int main()
 {
 	InitConr(128, 128);
-	SetColorKey(' ');
+	SetChar('X');
 
 	uint8 isVisible = 1;
 	while (StepConr())
 	{
+		float tick = GetTick(), delta = GetDelta();
+
 		char c = GetKeyPress();
 		switch (c)
 		{
@@ -58,22 +62,12 @@ int main()
 			break;
 		}
 
-		Fill('.');
+		Fill(' ');
 
 		if (isVisible)
 		{
-			String(64, 64,
-				"  ###  \n"
-				"  # #  \n"
-				"  ###  \n"
-				"   #   \n"
-				"#######\n"
-				"   #   \n"
-				"   #   \n"
-				"  # #  \n"
-				"  # #  \n"
-				"  # #  "
-			);
+			Circle(32, 32, cosf(tick) * 16.0f);
+			Line(96, 96, 96 + cosf(tick) * 32.0f, 96 + sinf(tick) * 32.0f);
 		}
 		
 		Swap();
