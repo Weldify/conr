@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <conio.h>
 #include <time.h>
+#include <string.h>
 
 static uint16 width, height, dWidth, dHeight, bufSize;
 static char curChar;
@@ -15,6 +16,7 @@ static COORD writeCoord;
 static clock_t lastTime;
 static float delta;
 static float tick;
+static char colorKey;
 
 uint8 InitConr(uint16 w, uint16 h)
 {
@@ -53,7 +55,9 @@ uint8 InitConr(uint16 w, uint16 h)
 	writeCoord.Y = 0;
 
 	lastTime = clock();
-	delta = 0.0f;
+	delta = .0f;
+	tick = .0f;
+	colorKey = ' ';
 
 	return 1;
 }
@@ -101,11 +105,23 @@ void SetChar(char c)
 	curChar = c;
 }
 
+void SetColorKey(char c)
+{
+	colorKey = c;
+}
+
 void Point(int16 x, int16 y)
 {
 	if (x < 0 || x > width || y < 0 || y > width) return;
 
 	buf[x + y * width] = curChar;
+}
+
+static void PointC(int16 x, int16 y, char c)
+{
+	if (x < 0 || x > width || y < 0 || y > width) return;
+
+	buf[x + y * width] = c;
 }
 
 void Line(int16 x0, int16 y0, int16 x1, int16 y1)
@@ -160,6 +176,24 @@ void Line(int16 x0, int16 y0, int16 x1, int16 y1)
 	}
 }
 
+void Rect(int16 ox, int16 oy, int16 w, int16 h)
+{
+	int8 xSide = w > 0 ? 1 : -1;
+	int8 ySide = h > 0 ? 1 : -1;
+
+	for (int16 x = ox; x <= ox + abs(w); x += xSide)
+	{
+		Point(x, oy);
+		Point(x, oy + h);
+	}
+
+	for (int16 y = ox; y <= ox + abs(h); y += ySide)
+	{
+		Point(ox, y);
+		Point(ox + w, y);
+	}
+}
+
 static void BresenhamSubCircle(int16 xc, int16 yc, int16 x, int16 y)
 {
 	Point(xc + x, yc + y);
@@ -192,6 +226,28 @@ void Circle(int16 x, int16 y, int16 r)
 		else d = d + 4 * xc + 6;
 
 		BresenhamSubCircle(x, y, xc, yc);
+	}
+}
+
+void String(int16 x, int16 y, const char* str)
+{
+	size_t len = strlen(str);
+
+	int16 curX = x;
+	for (int i = 0; i < len; i++)
+	{
+		char c = str[i];
+		if (c == '\n')
+		{
+			y++;
+			curX = x;
+			continue;
+		}
+
+		if (c != colorKey)
+			PointC(curX, y, c);
+
+		curX++;
 	}
 }
 

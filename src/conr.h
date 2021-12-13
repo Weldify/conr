@@ -14,6 +14,8 @@ typedef int8_t int8;
 #define KEY_S 115
 #define KEY_D 100
 
+#define CHAR_NONE 0
+
 #ifdef __cplusplus
 extern "C" 
 {
@@ -30,10 +32,13 @@ void Fill(char filler);
 void Swap();
 
 void SetChar(char c);
+void SetColorKey(char c);
 
 void Point(int16 x, int16 y);
 void Line(int16 x0, int16 y0, int16 x1, int16 y1);
+void Rect(int16 x, int16 y, int16 w, int16 h);
 void Circle(int16 x, int16 y, int16 radius);
+void String(int16 x, int16 y, const char* chars);
 
 char GetKeyPress();
 
